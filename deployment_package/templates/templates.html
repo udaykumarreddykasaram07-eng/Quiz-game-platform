@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Quiz Game Platform{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="container">
+        <h2 class="section-title">User Profile</h2>
+        
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3>{{ username }}</h3>
+                <p>Player since {{ '2026' }}</p>
+            </div>
+            
+            <div class="profile-stats">
+                <div class="stat-box">
+                    <span class="stat-number">42</span>
+                    <span class="stat-label">Games Played</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">1,240</span>
+                    <span class="stat-label">Total Points</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">87%</span>
+                    <span class="stat-label">Accuracy</span>
+                </div>
+            </div>
+            
+            <div class="profile-info">
+                <h4>Account Information</h4>
+                <div class="info-row">
+                    <span class="info-label">Username:</span>
+                    <span class="info-value">{{ username }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">user@example.com</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Member Since:</span>
+                    <span class="info-value">January 2026</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Play Quiz - {{ category }}{% endblock %}
+
+{% block content %}
+<section class="quiz-play-section">
+    <div class="container">
+        <div class="quiz-header">
+            <h2>{{ category }}</h2>
+            <div class="quiz-info">
+                <span class="question-count">Question <span id="current-question">1</span>/{{ questions|length }}</span>
+                <span class="timer" id="timer">00:00</span>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar" style="width: 10%;"></div>
+            </div>
+        </div>
+        
+        <form id="quiz-form" action="{{ url_for('game.submit_quiz') }}" method="POST">
+            <input type="hidden" name="category_id" value="{{ category_id }}">
+            
+            <div id="questions-container">
+                {% for question in questions %}
+                <div class="question-box" id="question-{{ loop.index }}" style="display: {% if loop.index == 1 %}block{% else %}none{% endif %};" data-question-id="{{ question.question_id }}">
+                    <h3 class="question-text">{{ loop.index }}. {{ question.question_text }}</h3>
+                    
+                    <div class="options-grid">
+                        <label class="option">
+                            <input type="radio" name="q{{ question.question_id }}" value="A" required>
+                            <span class="option-text">A) {{ question.option_a }}</span>
+                        </label>
+                        
+                        <label class="option">
+                            <input type="radio" name="q{{ question.question_id }}" value="B" required>
+                            <span class="option-text">B) {{ question.option_b }}</span>
+                        </label>
+                        
+                        <label class="option">
+                            <input type="radio" name="q{{ question.question_id }}" value="C" required>
+                            <span class="option-text">C) {{ question.option_c }}</span>
+                        </label>
+                        
+                        <label class="option">
+                            <input type="radio" name="q{{ question.question_id }}" value="D" required>
+                            <span class="option-text">D) {{ question.option_d }}</span>
+                        </label>
+                    </div>
+                    
+                    <div class="question-navigation">
+                        <button type="button" class="btn btn-secondary" onclick="prevQuestion()" style="display: none;" id="prev-btn">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextQuestion()" id="next-btn">
+                            {% if loop.index == questions|length %}
+                            <i class="fas fa-check"></i> Submit Quiz
+                            {% else %}
+                            Next Question <i class="fas fa-arrow-right"></i>
+                            {% endif %}
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+<script src="{{ url_for('static', filename='js/validation.js') }}"></script>
+<script>
+// Initialize quiz when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Quiz page loaded');
+    
+    // Initialize quiz
+    if (typeof initializeQuiz === 'function') {
+        initializeQuiz();
+    }
+    
+    // Add event listeners to navigation buttons
+    const nextBtn = document.getElementById('next-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', function() {
+            nextQuestion();
+        });
+    }
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+            prevQuestion();
+        });
+    }
+    
+    // Add keyboard shortcuts info
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'keyboard-info';
+    infoDiv.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-size: 14px; z-index: 1000;';
+    infoDiv.innerHTML = `
+        <strong>Keyboard Shortcuts:</strong><br>
+        1-4: Select options<br>
+        ← →: Navigate questions<br>
+        Enter: Next/Submit
+    `;
+    document.body.appendChild(infoDiv);
+    
+    // Auto-hide keyboard info after 5 seconds
+    setTimeout(() => {
+        infoDiv.style.opacity = '0';
+        infoDiv.style.transition = 'opacity 0.5s';
+    }, 5000);
+});
+
+// Global variables for quiz navigation
+let currentQuestionIndex = 0;
+const totalQuestions = {{ questions|length }};
+
+// Next question function
+function nextQuestion() {
+    const currentBox = document.getElementById(`question-${currentQuestionIndex + 1}`);
+    
+    // Validate answer
+    const questionId = currentBox.dataset.questionId;
+    const selectedOption = document.querySelector(`input[name="q${questionId}"]:checked`);
+    
+    if (!selectedOption && currentQuestionIndex < totalQuestions - 1) {
+        alert('Please select an answer before proceeding!');
+        return;
+    }
+    
+    // Hide current question
+    currentBox.style.display = 'none';
+    
+    // Show next question
+    currentQuestionIndex++;
+    
+    if (currentQuestionIndex < totalQuestions) {
+        const nextBox = document.getElementById(`question-${currentQuestionIndex + 1}`);
+        nextBox.style.display = 'block';
+        
+        // Update question counter
+        document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+        
+        // Update progress bar
+        updateProgressBar();
+        
+        // Show/hide previous button
+        const prevBtn = document.getElementById('prev-btn');
+        if (prevBtn) {
+            prevBtn.style.display = 'inline-block';
+        }
+        
+        // Update next button text
+        const nextBtn = document.getElementById('next-btn');
+        if (nextBtn) {
+            if (currentQuestionIndex === totalQuestions - 1) {
+                nextBtn.innerHTML = '<i class="fas fa-check"></i> Submit Quiz';
+            } else {
+                nextBtn.innerHTML = 'Next Question <i class="fas fa-arrow-right"></i>';
+            }
+        }
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
+        
+        // Add animation
+        nextBox.classList.add('slide-in-right');
+        setTimeout(() => {
+            nextBox.classList.remove('slide-in-right');
+        }, 500);
+    } else {
+        // Last question - submit quiz
+        if (confirm('Are you sure you want to submit your quiz?')) {
+            document.getElementById('quiz-form').submit();
+        }
+    }
+}
+
+// Previous question function
+function prevQuestion() {
+    if (currentQuestionIndex > 0) {
+        // Hide current question
+        const currentBox = document.getElementById(`question-${currentQuestionIndex + 1}`);
+        currentBox.style.display = 'none';
+        
+        // Show previous question
+        currentQuestionIndex--;
+        const prevBox = document.getElementById(`question-${currentQuestionIndex + 1}`);
+        prevBox.style.display = 'block';
+        
+        // Update question counter
+        document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+        
+        // Update progress bar
+        updateProgressBar();
+        
+        // Show/hide previous button
+        const prevBtn = document.getElementById('prev-btn');
+        if (prevBtn && currentQuestionIndex === 0) {
+            prevBtn.style.display = 'none';
+        }
+        
+        // Update next button text
+        const nextBtn = document.getElementById('next-btn');
+        if (nextBtn) {
+            nextBtn.innerHTML = 'Next Question <i class="fas fa-arrow-right"></i>';
+        }
+        
+        // Scroll to top
+        window.scrollTo(0, 0);
+        
+        // Add animation
+        prevBox.classList.add('slide-in-left');
+        setTimeout(() => {
+            prevBox.classList.remove('slide-in-left');
+        }, 500);
+    }
+}
+
+// Update progress bar
+function updateProgressBar() {
+    const progressBar = document.getElementById('progress-bar');
+    if (progressBar) {
+        const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+}
+
+// Validate form before submission
+function validateQuizForm() {
+    // Check if all questions are answered
+    for (let i = 0; i < totalQuestions; i++) {
+        const questionBox = document.getElementById(`question-${i + 1}`);
+        const questionId = questionBox.dataset.questionId;
+        const selectedOption = document.querySelector(`input[name="q${questionId}"]:checked`);
+        
+        if (!selectedOption) {
+            alert(`Please answer question ${i + 1}`);
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+// Add keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // '1', '2', '3', '4' keys to select options
+    if (e.key >= '1' && e.key <= '4') {
+        e.preventDefault();
+        const optionIndex = parseInt(e.key) - 1;
+        const currentQuestionBox = document.getElementById(`question-${currentQuestionIndex + 1}`);
+        const options = currentQuestionBox.querySelectorAll('.option input[type="radio"]');
+        
+        if (options[optionIndex]) {
+            options[optionIndex].checked = true;
+            
+            // Add visual feedback
+            currentQuestionBox.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            options[optionIndex].closest('.option').classList.add('selected');
+        }
+    }
+    
+    // 'ArrowRight' or 'Enter' to go to next question
+    if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        e.preventDefault();
+        nextQuestion();
+    }
+    
+    // 'ArrowLeft' to go to previous question
+    if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevQuestion();
+    }
+});
+
+// Add click event to options for better UX
+document.querySelectorAll('.option').forEach(option => {
+    option.addEventListener('click', function() {
+        // Find the radio input inside this label
+        const radio = this.querySelector('input[type="radio"]');
+        if (radio) {
+            radio.checked = true;
+            
+            // Add visual feedback
+            this.parentElement.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            this.classList.add('selected');
+        }
+    });
+});
+</script>
+{% endblock %}

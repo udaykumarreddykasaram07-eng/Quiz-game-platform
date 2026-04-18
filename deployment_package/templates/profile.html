@@ -1,0 +1,454 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Quiz Game Platform{% endblock %}
+
+{% block content %}
+<section class="profile-section">
+    <div class="container">
+        <h2 class="section-title">User Profile</h2>
+        
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3>{{ user.username }}</h3>
+                <p>Player since {{ user.registration_date.strftime('%B %Y') }}</p>
+            </div>
+            
+            <div class="profile-stats">
+                <div class="stat-box">
+                    <span class="stat-number">{{ user.total_games_played }}</span>
+                    <span class="stat-label">Games Played</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">{{ user.total_score }}</span>
+                    <span class="stat-label">Total Points</span>
+                </div>
+                <div class="stat-box">
+                    {% set avg_score = (user.total_score / user.total_games_played) | round(2) if user.total_games_played > 0 else 0 %}
+                    <span class="stat-number">{{ avg_score }}</span>
+                    <span class="stat-label">Avg Score</span>
+                </div>
+            </div>
+            
+            <div class="profile-info">
+                <h4>Account Information</h4>
+                <div class="info-row">
+                    <span class="info-label">Username:</span>
+                    <span class="info-value">{{ user.username }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Full Name:</span>
+                    <span class="info-value">{{ user.full_name if user.full_name else 'Not provided' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ user.email }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Member Since:</span>
+                    <span class="info-value">{{ user.registration_date.strftime('%B %d, %Y') }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Last Login:</span>
+                    <span class="info-value">{{ user.last_login.strftime('%B %d, %Y at %I:%M %p') if user.last_login else 'Never' }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Account Status:</span>
+                    <span class="info-value" style="color: {% if user.status == 'active' %}#10b981{% else %}#ef4444{% endif %};">
+                        {{ user.status | capitalize }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                <a href="{{ url_for('game.dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+        
+        <!-- Category Performance -->
+        <div class="analytics-section">
+            <h3 class="section-subtitle">Category Performance</h3>
+            <div class="analytics-grid">
+                {% for analytics in analytics %}
+                <div class="analytics-card">
+                    <h4>{{ analytics.category.category_name }}</h4>
+                    <div class="analytics-stat">
+                        <span class="label">Attempts:</span>
+                        <span class="value">{{ analytics.total_attempts }}</span>
+                    </div>
+                    <div class="analytics-stat">
+                        <span class="label">Correct:</span>
+                        <span class="value" style="color: #10b981;">{{ analytics.total_correct }}</span>
+                    </div>
+                    <div class="analytics-stat">
+                        <span class="label">Wrong:</span>
+                        <span class="value" style="color: #ef4444;">{{ analytics.total_wrong }}</span>
+                    </div>
+                    <div class="analytics-stat">
+                        <span class="label">Accuracy:</span>
+                        <span class="value">{{ "%.2f"|format(analytics.accuracy_percentage) }}%</span>
+                    </div>
+                    <div class="analytics-stat">
+                        <span class="label">Avg Time:</span>
+                        <span class="value">{{ analytics.average_time_per_question }}s</span>
+                    </div>
+                    {% if analytics.favorite_category %}
+                    <div class="favorite-badge">
+                        <i class="fas fa-star"></i> Favorite Category
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="no-data">
+                    <i class="fas fa-chart-line"></i>
+                    <p>No quiz data yet. Start playing to see your performance!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Recent Games -->
+        <div class="recent-games-section">
+            <h3 class="section-subtitle">Recent Games</h3>
+            {% if recent_games %}
+            <table class="recent-games-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Score</th>
+                        <th>Correct/Wrong</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for game in recent_games %}
+                    <tr>
+                        <td>{{ game.game_start_time.strftime('%b %d, %Y') }}</td>
+                        <td>{{ game.category.category_name }}</td>
+                        <td>
+                            <span style="color: #10b981; font-weight: 700;">{{ game.score }}</span>
+                        </td>
+                        <td>
+                            <span style="color: #10b981;">{{ game.correct_answers }}</span> / 
+                            <span style="color: #ef4444;">{{ game.wrong_answers }}</span>
+                        </td>
+                        <td>{{ (game.time_taken_seconds / 60) | round(2) }} min</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-data">
+                <i class="fas fa-trophy"></i>
+                <p>You haven't played any games yet. Start your first quiz!</p>
+                <a href="{{ url_for('game.quiz') }}" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Start Quiz
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.profile-section {
+    padding: 60px 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.profile-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    text-align: center;
+    padding: 50px 30px;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 64px;
+    border: 4px solid white;
+}
+
+.profile-header h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.profile-header p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 30px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 20px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow-hover);
+}
+
+.stat-box .stat-number {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.stat-box .stat-label {
+    font-size: 14px;
+    color: var(--gray-color);
+    font-weight: 500;
+}
+
+.profile-info {
+    padding: 30px;
+}
+
+.profile-info h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: var(--dark-color);
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--gray-color);
+}
+
+.info-value {
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.profile-actions {
+    padding: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.profile-actions .btn {
+    padding: 12px 30px;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: translateY(-2px);
+}
+
+/* Analytics Section */
+.analytics-section, .recent-games-section {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 30px;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 30px;
+}
+
+.section-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 25px;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.analytics-card {
+    background: #f8fafc;
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    border-left: 4px solid var(--primary-color);
+}
+
+.analytics-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow-hover);
+}
+
+.analytics-card h4 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--dark-color);
+}
+
+.analytics-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.analytics-stat:last-child {
+    border-bottom: none;
+}
+
+.analytics-stat .label {
+    color: var(--gray-color);
+    font-weight: 500;
+}
+
+.analytics-stat .value {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.favorite-badge {
+    margin-top: 15px;
+    padding: 10px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-weight: 600;
+}
+
+.favorite-badge i {
+    margin-right: 5px;
+}
+
+/* Recent Games Table */
+.recent-games-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.recent-games-table th {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 15px;
+    text-align: left;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+.recent-games-table td {
+    padding: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.recent-games-table tr:hover {
+    background: #f8fafc;
+}
+
+/* No Data Message */
+.no-data {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-color);
+}
+
+.no-data i {
+    font-size: 64px;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+.no-data p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-actions {
+        flex-direction: column;
+    }
+    
+    .info-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .recent-games-table {
+        font-size: 14px;
+    }
+    
+    .recent-games-table th,
+    .recent-games-table td {
+        padding: 10px 5px;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,197 @@
+/* ========================================
+   LEADERBOARD STYLES
+   ======================================== */
+
+   .leaderboard-section {
+    padding: 60px 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.leaderboard-container {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    max-width: 1000px;
+    margin: 40px auto;
+}
+
+.leaderboard-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    display: grid;
+    grid-template-columns: 60px 1fr 120px 100px;
+    padding: 20px 30px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    text-align: center;
+}
+
+.leaderboard-header .rank,
+.leaderboard-header .score,
+.leaderboard-header .games {
+    font-size: 16px;
+}
+
+.leaderboard-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 120px 100px;
+    padding: 20px 30px;
+    border-bottom: 1px solid #e2e8f0;
+    transition: var(--transition);
+    align-items: center;
+}
+
+.leaderboard-row:hover {
+    background: #f8fafc;
+    transform: translateX(5px);
+}
+
+.leaderboard-row.gold {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+    font-weight: 700;
+}
+
+.leaderboard-row.silver {
+    background: linear-gradient(135deg, #a0aec0, #718096);
+    color: white;
+    font-weight: 700;
+}
+
+.leaderboard-row.bronze {
+    background: linear-gradient(135deg, #f89841, #c06c37);
+    color: white;
+    font-weight: 700;
+}
+
+.leaderboard-row .rank {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.leaderboard-row.gold .rank {
+    font-size: 32px;
+}
+
+.leaderboard-row .player {
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.leaderboard-row.gold .player i {
+    color: #fbbf24;
+    font-size: 24px;
+}
+
+.leaderboard-row .score,
+.leaderboard-row .games {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    text-align: center;
+}
+
+.leaderboard-row.gold .score {
+    color: #fbbf24;
+    font-size: 20px;
+}
+
+/* Category Leaders Section */
+.category-leaders-section {
+    margin-top: 60px;
+}
+
+.category-leaders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.category-leader-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 30px;
+    text-align: center;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    border-top: 4px solid var(--primary-color);
+}
+
+.category-leader-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--box-shadow-hover);
+}
+
+.category-leader-card h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--dark-color);
+}
+
+.category-leader-card .leader-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    display: block;
+    margin: 10px 0;
+}
+
+.category-leader-card .leader-score {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--secondary-color);
+    display: block;
+    margin: 10px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .leaderboard-header,
+    .leaderboard-row {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "rank player"
+            "score games";
+    }
+    
+    .leaderboard-header .rank,
+    .leaderboard-row .rank {
+        grid-area: rank;
+    }
+    
+    .leaderboard-header .player,
+    .leaderboard-row .player {
+        grid-area: player;
+    }
+    
+    .leaderboard-header .score,
+    .leaderboard-row .score {
+        grid-area: score;
+    }
+    
+    .leaderboard-header .games,
+    .leaderboard-row .games {
+        grid-area: games;
+    }
+    
+    .category-leaders-grid {
+        grid-template-columns: 1fr;
+    }
+}

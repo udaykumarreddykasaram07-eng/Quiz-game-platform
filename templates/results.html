@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Results - {{ category }}{% endblock %}
+
+{% block content %}
+<section class="results-section">
+    <div class="container">
+        <div class="results-container">
+            <div class="results-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            
+            <h2>Quiz Completed!</h2>
+            <p class="category-name">{{ category }}</p>
+            
+            <div class="score-display">
+                <div class="score-circle">
+                    <span class="score-number">{{ score }}</span>
+                    <span class="score-label">/ {{ total }}</span>
+                </div>
+            </div>
+            
+            <div class="performance-stats">
+                <div class="stat">
+                    <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                    <span>{{ correct }} Correct</span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-times-circle" style="color: #ef4444;"></i>
+                    <span>{{ wrong }} Wrong</span>
+                </div>
+                <div class="stat">
+                    <i class="fas fa-clock" style="color: #3b82f6;"></i>
+                    <span>{{ time_taken }}</span>
+                </div>
+            </div>
+            
+            <div class="result-message">
+                {% if score >= 80 %}
+                <p class="excellent">Excellent! You're a quiz master! 🎉</p>
+                {% elif score >= 60 %}
+                <p class="good">Good job! Keep practicing! 👍</p>
+                {% else %}
+                <p class="needs-improvement">Keep learning and try again! 💪</p>
+                {% endif %}
+            </div>
+            
+            <div class="result-actions">
+                <a href="{{ url_for('game.dashboard') }}" class="btn btn-primary" id="dashboard-btn">
+                    <i class="fas fa-home"></i> Back to Dashboard
+                </a>
+                <a href="{{ url_for('game.quiz') }}" class="btn btn-secondary" id="play-again-btn">
+                    <i class="fas fa-redo"></i> Play Another Quiz
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.results-section {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 60px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.results-container {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 60px;
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    box-shadow: var(--box-shadow-hover);
+    animation: fadeIn 0.8s ease;
+    position: relative;
+    z-index: 10;
+}
+
+.results-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    color: white;
+    font-size: 48px;
+    position: relative;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    animation: bounce 0.8s ease;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.results-container h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.category-name {
+    font-size: 18px;
+    color: var(--gray-color);
+    margin-bottom: 40px;
+}
+
+.score-display {
+    margin: 40px 0;
+}
+
+.score-circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: var(--box-shadow);
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+.score-circle::before {
+    content: '';
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    background: white;
+    z-index: -1;
+}
+
+.score-number {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 64px;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.score-label {
+    font-size: 24px;
+    color: var(--gray-color);
+    margin-left: 10px;
+}
+
+.performance-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 40px 0;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.stat:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow);
+}
+
+.stat i {
+    font-size: 32px;
+}
+
+.stat span {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.result-message {
+    margin: 40px 0;
+}
+
+.result-message p {
+    font-size: 20px;
+    font-weight: 600;
+    padding: 15px 30px;
+    border-radius: var(--border-radius);
+    display: inline-block;
+}
+
+.excellent {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.good {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.needs-improvement {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+}
+
+.result-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.result-actions .btn {
+    padding: 14px 35px;
+    font-size: 16px;
+    border-radius: 50px;
+}
+
+.result-actions .btn i {
+    margin-right: 8px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
+    to { box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .results-container {
+        padding: 40px 20px;
+    }
+    
+    .score-circle {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .score-number {
+        font-size: 48px;
+    }
+    
+    .score-label {
+        font-size: 18px;
+    }
+    
+    .performance-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .result-actions {
+        flex-direction: column;
+    }
+    
+    .result-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ROBUST SOUND PLAYER - Works with browser autoplay policy
+class SoundPlayer {
+    constructor() {
+        this.audioContext = null;
+        this.isInitialized = false;
+        this.celebrationSound = null;
+        this.clickSound = null;
+    }
+    
+    // Initialize audio context on first user interaction
+    init() {
+        if (this.isInitialized) return;
+        
+        try {
+            // Create audio context
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Create celebration sound (short beep)
+            this.celebrationSound = this.createBeep(800, 0.3, 0.15);
+            
+            // Create click sound
+            this.clickSound = this.createBeep(400, 0.1, 0.05);
+            
+            this.isInitialized = true;
+            console.log('✅ Sound system initialized');
+        } catch (e) {
+            console.log('⚠️ Sound initialization failed:', e);
+        }
+    }
+    
+    // Create a simple beep sound using Web Audio API (no external files needed!)
+    createBeep(frequency, duration, volume) {
+        if (!this.audioContext) return null;
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.value = frequency;
+        oscillator.type = 'sine';
+        gainNode.gain.value = volume;
+        
+        oscillator.start();
+        oscillator.stop(this.audioContext.currentTime + duration);
+        
+        gainNode.gain.exponentialRampToValueAtTime(
+            0.001, 
+            this.audioContext.currentTime + duration
+        );
+        
+        return oscillator;
+    }
+    
+    // Play celebration sound
+    playCelebration() {
+        if (!this.isInitialized) {
+            // Try to initialize on user interaction
+            this.init();
+            
+            // Fallback: show notification if sound fails
+            setTimeout(() => {
+                if (!this.isInitialized) {
+                    console.log('ℹ️ Sound requires user interaction to play');
+                }
+            }, 1000);
+        }
+        
+        if (this.isInitialized && this.audioContext?.state === 'running') {
+            this.createBeep(800, 0.1, 0.2); // First beep
+            setTimeout(() => this.createBeep(1000, 0.1, 0.25), 100); // Second beep
+            setTimeout(() => this.createBeep(1200, 0.15, 0.3), 200); // Third beep (higher pitch)
+            console.log('🎵 Celebration sound played');
+        }
+    }
+    
+    // Play click sound
+    playClick() {
+        if (this.isInitialized && this.audioContext?.state === 'running') {
+            this.createBeep(400, 0.05, 0.1);
+        }
+    }
+}
+
+// Initialize sound player
+const soundPlayer = new SoundPlayer();
+
+// Play celebration sound when page loads (will work after first user interaction)
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize sound on first user interaction (click/tap)
+    const initSound = () => {
+        soundPlayer.init();
+        document.body.removeEventListener('click', initSound);
+        document.body.removeEventListener('touchstart', initSound);
+    };
+    
+    document.body.addEventListener('click', initSound, { once: true });
+    document.body.addEventListener('touchstart', initSound, { once: true });
+    
+    // Play celebration sound after short delay
+    setTimeout(() => {
+        soundPlayer.playCelebration();
+        
+        // Add visual celebration effect
+        const scoreCircle = document.querySelector('.score-circle');
+        if (scoreCircle) {
+            scoreCircle.style.animation = 'pulse 0.3s ease 3';
+        }
+    }, 500);
+    
+    // Add click sounds to buttons
+    document.getElementById('dashboard-btn')?.addEventListener('click', () => {
+        soundPlayer.init();
+        soundPlayer.playClick();
+    });
+    
+    document.getElementById('play-again-btn')?.addEventListener('click', () => {
+        soundPlayer.init();
+        soundPlayer.playClick();
+    });
+});
+</script>
+{% endblock %}

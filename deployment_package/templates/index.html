@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Quiz Game Platform{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Test Your Knowledge</h1>
+            <p class="hero-subtitle">Challenge yourself with exciting quizzes across multiple categories</p>
+            <div class="hero-buttons">
+                {% if 'username' in session %}
+                <a href="{{ url_for('game.dashboard') }}" class="btn btn-primary btn-large">Start Quiz</a>
+                {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-large">Get Started</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-large">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">Why Choose QuizMaster?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <h3>Leaderboards</h3>
+                <p>Compete with players worldwide and climb to the top</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3>Multiple Categories</h3>
+                <p>8 different quiz categories to test your knowledge</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Track Progress</h3>
+                <p>View your performance analytics and improvement over time</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Timed Challenges</h3>
+                <p>Beat the clock and earn bonus points for speed</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number" id="total-players">0</span>
+                <span class="stat-label">Players</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="total-questions">0</span>
+                <span class="stat-label">Questions</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="total-games">0</span>
+                <span class="stat-label">Games Played</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="total-categories">0</span>
+                <span class="stat-label">Categories</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Challenge Yourself?</h2>
+            <p>Join thousands of players and start your quiz journey today!</p>
+            {% if 'username' in session %}
+            <a href="{{ url_for('game.dashboard') }}" class="btn btn-primary btn-large">Play Now</a>
+            {% else %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-large">Create Account</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Simple counter animation
+function animateCounter(element, target) {
+    let count = 0;
+    const increment = Math.ceil(target / 50);
+    const timer = setInterval(() => {
+        count += increment;
+        if (count >= target) {
+            count = target;
+            clearInterval(timer);
+        }
+        element.textContent = count.toLocaleString();
+    }, 30);
+}
+
+// Initialize counters
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        animateCounter(document.getElementById('total-players'), 10000);
+        animateCounter(document.getElementById('total-questions'), 1000);
+        animateCounter(document.getElementById('total-games'), 50000);
+        animateCounter(document.getElementById('total-categories'), 8);
+    }, 500);
+});
+</script>
+{% endblock %}

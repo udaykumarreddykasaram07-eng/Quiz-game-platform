@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Select Quiz Category - Quiz Game Platform{% endblock %}
+
+{% block content %}
+<section class="quiz-selection-section">
+    <div class="container">
+        <h2 class="section-title">Choose Your Quiz Category</h2>
+        <p class="section-subtitle">Select a category to start your quiz challenge</p>
+        
+        <div class="categories-grid">
+            {% for category in categories %}
+            <a href="{{ url_for('game.play_quiz', category_id=category['category_id']) }}" class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3>{{ category['category_name'] }}</h3>
+                <p>{{ category['category_description'] }}</p>
+                <div class="category-footer">
+                    <span class="question-count">10 Questions</span>
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
