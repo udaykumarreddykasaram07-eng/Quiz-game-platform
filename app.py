@@ -133,4 +133,4 @@ if __name__ == '__main__':
     print("="*60)
     print(f"🚀 Running on http://localhost:5002")
     print("="*60 + "\n")
-    app.run(debug=True, host='0.0.0.0', port=5004)
+    app.run(debug=True, host='0.0.0.0', port=5005)
